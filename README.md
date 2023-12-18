@@ -1,3 +1,6 @@
 # An open-source, low-cost system for continuous nitrate monitoring in soil and open water
 
 This device aims to assist in automizing nitrate readings for pore water samples at lower costs. The code for the device where it automatically collects samples, creates the reagent-pore water sample mix based on the 9:1 ratio, and take the spectrophotometer reading one a day is given in the daily_once code in this github. It can be modified according to adjustments and changes made depending on what you would like to use this device for. The amount of time each vacuum is run for can be changed if required, and may be required, depending on the user. The circuit diagram for the PCB and Arduino Mega microcontroller being used is also available in this github. 
+
+“The spectrophotometer component in this project is based on the design from a paper by Laganovska et al., 2020 (Katrina Laganovska, Aleksejs Zolotarjovs, Mercedes Vázquez, Kirsty Mc Donnell, Janis Liepins, Hadar Ben-Yoav, Varis Karitans, Krisjanis Smits, Portable low-cost open-source wireless spectrophotometer for fast and reliable measurements, HardwareX, Volume 7, 2020, e00108, ISSN 2468-0672, https://doi.org/10.1016/j.ohx.2020.e00108 (https://www.sciencedirect.com/science/article/pii/S246806722030016X))”. 
+- The 3D print files can be found here: https://osf.io/rbfse/
