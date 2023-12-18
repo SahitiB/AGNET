@@ -1,5 +1,5 @@
 // This is the code to collect water and get the spectrophotometer reading as a part of an open-source, low-cost system for continuous nitrate monitoring in soil and open water
-// By Sahiti Bulusu, Basis Independent Fremont
+// By Sahiti Bulusu, Basis Independent Fremont, and Elad Levintal, Ben Gurion University
 // Basic troubleshooting mechanisms of this code: the suction times per vacuum can vary if the tube length, arch of the tube, or the inner diameter of the tube changes, so be sure to calibrate the system once prior to allowing it to run automated
 // More information about the low-cost spectrophotometer, it's code and building instructions can be found here --> https://www.sciencedirect.com/science/article/pii/S246806722030016X
 // The current sampling frequency of this code is once a day. This can be changed in 2 ways: 
@@ -49,16 +49,14 @@ int START=7;
 int ledPin = 18;
 
 
-// Sahiti added code : to add another LED
 int liq_level = 0;
 
-//J26 - Changed water sensor pin per the schematic
-//int water_sensor = 41;
+
 int water_sensor = 40;
 
 
 
-//J26 defining new inputs per the driver schematic
+//Inputs per the driver schematic
 int  IN1 =  3;
 int  IN2 =  4;
 int  IN3 =  5;
@@ -91,7 +89,8 @@ void GetBaseline(){ //to be multiplied with
 
   readSpectrometer();
   delay(100);
-  
+
+  //setting fixed baseline so that it doesn't change everytime disconnected from power source (average1 is found in readSpectrometer() so when calibrating the spectrometer for the first time, let it run and if average1 is different from the below baseline, replace it)
   int average1[] = {9314,9433,9401,9410,9431,9428,9440,9412,9496,9421,9391,9414,9473,9416,9339,9436,9451,9418,9407,9442,9453,9464,9440,9402,9457,9450,9472,9393,9485,9493,9443,9450,9449,9437,9465,9459,9490,9471,9454,9484,9420,9454,8695,7994,7355,6487,5396,4275,2724,1646,1612,1311,1310,1349,1262,1326,1354,1473,1595,1841,2010,2458,3398,3824,5025,5293,5698,6114,6076,6290,5978,6032,5414,5874,4824,5303,4701,4135,4559,4242,4187,3865,3479,3541,3766,3020,3147,3285,2955,3145,2853,3335,2914,3664,2735,3524,3121,3202,3213,3564,3345,3725,3578,3977,3735,3584,4263,3615,3791,4003,4285,4294,4300,4360,4818,4732,4816,5186,4981,5533,5322,5573,5568,5786,6057,6018,6160,6467,6641,6756,6652,6919,7033,7249,7231,7277,7622,7492,7787,7638,7841,7799,8044,7953,8142,8272,8387,8503,8640,9023,9206,9315,9337,9361,9339,9465,9449,9450,9440,9552,9459,9407,9473,9516,9510,9414,9410,9440,9510,9422,9418,9462,9440,9487,9393,9458,9481,9460,9401,9430,9471,9391,9441,9432,9427,9420,9447,9460,9476,9451,9419,9393,9460,9460,9430,9413,9480,9451,9489,9480,9510,9437,9380,9502,9496,9423,9477,9446,9466,9470,9464,9441,9451,9439,9415,9509,9431,9434,9470,9392,9450,9350,9461,9389,9401,9363,9374,9312,9311,9296,9390,9299,9302,9354,9346,9430,9454,9398,9423,9500,9518,9420,9400,9416,9420,9444,9516,9503,9434,9427,9475,9420,9488,9458,9452,9380,9484,9481,9463,9458,9474,9461,9484,9375,9342,9136,8944,8723,8617,8407,8279,8210,8130,8105,8119,8119,8112,8068,8107,8086,8148,8108,8091,8133,8035,7966,7918};
   for(int i = 0; i < 287; i++){
     average[i] = average1[i];
@@ -107,7 +106,7 @@ void GetBaseline(){ //to be multiplied with
   
   }
   
-  //setting fixed baseline so that it doesn't change everytime disconnected from power source
+  
   
   
   //mySerial.print(" ");
