@@ -1,7 +1,7 @@
 // This is the code to collect water and get the spectrophotometer reading as a part of an open-source, low-cost system for continuous nitrate monitoring in soil and open water
 // By Sahiti Bulusu, Basis Independent Fremont, and Elad Levintal, Ben Gurion University
 // Basic troubleshooting mechanisms of this code: the suction times per vacuum can vary if the tube length, arch of the tube, or the inner diameter of the tube changes, so be sure to calibrate the system once prior to allowing it to run automated
-// More information about the low-cost spectrophotometer, it's code and building instructions can be found here --> https://www.sciencedirect.com/science/article/pii/S246806722030016X
+// More information about the low-cost spectrophotometer, it's code and building instructions can be found here --> https://www.sciencedirect.com/science/article/pii/S246806722030016X (the spectrophotometer portion of this code is building on their original code)
 // The current sampling frequency of this code is once a day. This can be changed in 2 ways: 
 //       1. You can change the run_no variable to the amount of runs you would like, and that will cause it to go into a loop for that many runs from the second it is connected to power
 //       2. You can uncomment the loops that control the device according to the RTC time, and have a set time for the device to run. This would allow you to control the exact times you want the device to run as well. This can be paired with the first option if you would like the runs to start at a certain time and continue looping for a certain number of runs ever since the first time condition was met.
@@ -265,7 +265,8 @@ void runvaccumtwopins(int lowpin1, int highpin2, int runfor){
 
 
 
-//takes the spectrometer reading and saves it to the sd card file
+//takes the spectrometer reading and saves it to the sd card file (built upon from original code provided in "Laganovska et al., 2020 (Katrina Laganovska, Aleksejs Zolotarjovs, Mercedes Vázquez, Kirsty
+Mc Donnell, Janis Liepins, Hadar Ben-Yoav, Varis Karitans, Krisjanis Smits, Portable low-cost open-source wireless spectrophotometer for fast and reliable measurements")
 void Capture(){ // this captures the absorption spectrum when called
   aveabs=0;
   String spacing = String(", "); //the application reads data in "nm, intensity" format, so a comma and a space is needed
@@ -297,14 +298,15 @@ void Capture(){ // this captures the absorption spectrum when called
   for(i = 53; i < 198; i++){//reads from position 53 to position 198, which corresponds to approximately 450-750nm
   uint16_t nm[145];
   int corr;
-  //nm[i-53] = (3.103932661*pow(10,2)+2.683934106*i-1.098262279*pow(10,-3)*pow(i,2)-7.817392551*pow(10,-6)*pow(i,3)+9.609636190*pow(10,-9)*pow(i,4)+4.681760466*pow(10,-12)*pow(i,5))*10;
+   
+  //nm[i] calculates the corresponding wavelength to each pixel - the parameters are included in the C12880MA manual and are unique, so the below line needs to be corrected accordingly (check the manual of your specific chip)
   nm[i-53] = (3.038924085*pow(10,2)+2.715277913*i-1.245962432*pow(10,-3)*pow(i,2)-7.391530247*pow(10,-6)*pow(i,3)+9.130177259*pow(10,-9)*pow(i,4)+4.718390529*pow(10,-12)*pow(i,5))*10;
-  //nm[i] calculates the corresponding wavelength to each pixel - the parameters are included in the C12880MA manual and are unique, so the above line needs to be corrected accordingly
+  
   /*in order to just register and check the spectrum of the light source
   comment out lines starting from the "corr=correction[i]" to "float n = log10(m)"
   line (included) and substitute "String(n,4)" in the "String val =" with "data[i]"*/
   
-  //corr=correction[i]; // this copies the baseline data, so it could be modified without modifying the actual baseline data
+  //corr=correction[i]; // this copies the baseline data, so it could be modified without modifying the actual baseline data (only for debugging purposes)
   //average[i]=average[i]-980; // removes background. background values vary a bit for every measurement, 96 is an average of about 10 measurements
   //if((average[i]<1)||(average[i]>65000)){average[i]=1;}// corr=6500;} // this makes sure that there is no overflow or division by zero (usually happens when spectra outside of the LED spectrum is registered)
   
@@ -312,7 +314,7 @@ void Capture(){ // this captures the absorption spectrum when called
   float n = log10(m)+0.0556-0.0767*aveabs; // calculates absorbance
   
   float integ = nm[i-53]/10.0; //this is due to the multiplication by 10 at the end of nm[i] calculation. This is used to avoid a float massive, which takes up more space than an int massive - this means that we get for example a calculated position of 550.12345*10 =5501.2345 (which is 5501 as an int) and then we divide it back as a float and get the value of 550.1 nm
-  String temp = String(integ,1); //turns it into a sting with 1 decimal place
+  String temp = String(integ,1); //turns it into a string with 1 decimal place
   String val = String(n,4); //turns into a string with 4 decimal places
   
   
@@ -324,10 +326,12 @@ void Capture(){ // this captures the absorption spectrum when called
           //myFile.println(run_no);
           myFile.println(tot);
          }
+   
+       // if you would like the data to be stored in an array, uncomment the below code
          //spec_absor[i-53]=val;
          //spec_absor[i-53][0] = temp;
          //spec_absor[i-53][1] = val;
-       //  Serial.print(tot);
+        //Serial.print(tot);
          //mySerial.print(tot); //prints the "nm, absorbance" string
          tot = ""; //erases the contents of the "nm, absorbance" string
   
@@ -418,7 +422,7 @@ void setup() {
   
   pinMode(CLK, OUTPUT);
   pinMode(START, OUTPUT);
-  //J26 -- NOT SURE WHAT IS A0
+  
   pinMode(A0, INPUT);
   pinMode(ledPin, INPUT);
 
@@ -478,20 +482,11 @@ stop=true;
   if(stop){
     
     int run_no = 0;
-    
 
     Serial.println("in loop");   
-    
-    
-    
-    
-
-    
     // starts system loop at chosen time everyday (if following option 2 of controlling the sampling frequency, this is the loop to be uncommented)
     //if( time.hour()==10 && time.minute()==30){
     
-      
-      
       //the run number increments every time the loop starts
       run_no = run_no + 1;
 
@@ -576,9 +571,6 @@ stop=true;
         Serial.println("third vacuum ran and put all the solution into the cuvette");
         delay(10000);
     
-        
-        
-        
         //4 hrs delay now
         CalibrateLED();
         // if temperature curve comes, put in the correlation metrics according to measured temperature
